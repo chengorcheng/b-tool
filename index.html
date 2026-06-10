@@ -1,0 +1,402 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金海岸 · 算理小老师 + 自评</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 650px;
+            width: 100%;
+        }
+        .section-title {
+            font-size: 20px;
+            color: #c62828;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 28px; }
+        .ai-bubble {
+            background: #e8eaf6;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .ai-bubble .avatar { font-size: 36px; min-width: 40px; }
+        .ai-bubble .content { flex: 1; }
+        .ai-bubble .name {
+            font-weight: bold;
+            color: #3f51b5;
+            margin-bottom: 5px;
+        }
+        .ai-bubble .text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 20px;
+            border: 2px solid #c62828;
+            border-radius: 25px;
+            background: white;
+            color: #c62828;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn:hover { background: #ffebee; }
+        .btn.active { background: #c62828; color: white; }
+        .btn-primary { background: #c62828; color: white; }
+        .btn-primary:hover { background: #b71c1c; }
+        .student-area {
+            background: #fff9c4;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .student-area textarea {
+            width: 100%;
+            height: 80px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        .stars { display: flex; gap: 5px; justify-content: center; margin: 15px 0; }
+        .star {
+            font-size: 36px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: 0.3s;
+            user-select: none;
+        }
+        .star.lit { opacity: 1; color: #ffd600; }
+        .star:hover { transform: scale(1.2); }
+        .comment-box {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .comment-box .title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+        .divider { border: none; border-top: 2px dashed #e0e0e0; margin: 20px 0; }
+        .hidden { display: none; }
+        .version-tip { margin-bottom: 10px; font-size: 14px; color: #666; }
+
+        .table-fa {
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 14px;
+            background: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .table-fa td {
+            border: 1px solid #bbb;
+            padding: 8px 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 点评等级样式 */
+   .comment-level {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .comment-level.excellent { background: #ffd600; color: #333; }
+        .comment-level.good { background: #c8e6c9; color: #2e7d32; }
+        .comment-level.encourage { background: #ffccbc; color: #bf360c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-title">
+            <span class="icon">🧑‍🏫</span> 第二关：算理小老师
+        </div>
+
+        <div class="ai-bubble">
+            <div class="avatar">🤖</div>
+            <div class="content">
+                <div class="name">豆包AI学伴</div>
+                <div class="text" id="doubaoExplanation">
+                    18 × 3，我的计算方法是：<br>
+                    把18拆成<strong>10和8</strong>，<br>
+                    10 × 3 = 30，<br>
+                    8 × 3 = 24，<br>
+                    30 + 24 = 54。<br>
+                    你觉得我讲得清楚吗？
+                </div>
+            </div>
+        </div>
+
+        <div class="version-tip">切换豆包的讲解版本：</div>
+        <div class="btn-group" id="versionBtns">
+            <button class="btn active" data-version="0">版本1：拆分10和8</button>
+            <button class="btn" data-version="1">版本2：拆分9和9</button>
+            <button class="btn" data-version="2">版本3：表格法</button>
+        </div>
+
+        <div class="student-area">
+            <div style="font-weight:bold;margin-bottom:8px;">📝 你的评价（豆包讲得怎么样？你还能怎么讲？）</div>
+            <textarea id="studentComment" placeholder="例如：豆包讲得对，但我有不同方法……"></textarea>
+        </div>
+
+        <div class="student-area">
+            <div style="font-weight:bold;margin-bottom:8px;">📐 创编一道 16 × 3 = 48 的应用题（结合采购情境）</div>
+            <textarea id="studentProblem" placeholder="例如：一个泳镜16元，买3个泳镜需要多少钱？"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="commentBtn" style="display:block;margin:0 auto;">🤖 请店长小慧点评</button>
+        <div class="comment-box hidden" id="xiaohuiCommentBox">
+            <div class="title">🧜‍♀️ 店长小慧的点评：</div>
+            <div id="xiaohuiCommentText"></div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section-title">
+            <span class="icon">🌳</span> 黄金海岸成长树 · 课堂自评表
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <div style="font-weight:bold;margin-bottom:5px;">1. 计算做题，我能做到准确认真</div>
+            <div class="stars" id="stars1">
+                <span class="star" data-value="1">⭐</span>
+                <span class="star" data-value="2">⭐</span>
+                <span class="star" data-value="3">⭐</span>
+                <span class="star" data-value="4">⭐</span>
+                <span class="star" data-value="5">⭐</span>
+            </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <div style="font-weight:bold;margin-bottom:5px;">2. 我可以完整讲出计算道理</div>
+            <div class="stars" id="stars2">
+                <span class="star" data-value="1">⭐</span>
+                <span class="star" data-value="2">⭐</span>
+                <span class="star" data-value="3">⭐</span>
+                <span class="star" data-value="4">⭐</span>
+                <span class="star" data-value="5">⭐</span>
+            </div>
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <div style="font-weight:bold;margin-bottom:5px;">3. 课堂愿意发言、合作交流</div>
+            <div class="stars" id="stars3">
+                <span class="star" data-value="1">⭐</span>
+                <span class="star" data-value="2">⭐</span>
+                <span class="star" data-value="3">⭐</span>
+                <span class="star" data-value="4">⭐</span>
+                <span class="star" data-value="5">⭐</span>
+            </div>
+        </div>
+
+        <div class="student-area">
+            <div style="font-weight:bold;margin-bottom:8px;">💬 今天我最大的收获（写一句话）</div>
+            <textarea id="studentGain" placeholder="例如：我学会了把两位数拆开乘，再相加……"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="saveBtn" style="display:block;margin:0 auto;">📋 保存自评结果</button>
+        <div class="comment-box hidden" id="saveConfirm" style="text-align:center;">
+            ✅ 自评结果已保存！小慧店长收到了你的成长记录。
+        </div>
+    </div>
+
+    <script>
+        const doubaoVersions = [
+            '18 × 3，我的计算方法是：<br>把18拆成<strong>10和8</strong>，<br>10 × 3 = 30，<br>8 × 3 = 24，<br>30 + 24 = 54。<br>你觉得我讲得清楚吗？',
+            '18 × 3，我换一种方法：<br>把18拆成<strong>9和9</strong>，<br>9 × 3 = 27，<br>9 × 3 = 27，<br>27 + 27 = 54。<br>这种拆法更巧妙吧？',
+            '18 × 3，我用<strong>表格记账法</strong>：<br>' +
+            '<table class="table-fa">' +
+            '<tr><td>×</td><td>10</td><td>8</td></tr>' +
+            '<tr><td>3</td><td>30</td><td>24</td></tr>' +
+            '</table>' +
+            '合计：30 + 24 = 54。'
+        ];
+
+        // ========== 判断学生是否在表达“不会” ==========
+        function isExpressionOfDifficulty(text) {
+            const keywords = [
+                '不会', '不知道', '不懂', '太难', '不会做',
+                '不会写', '想不出', '想不到', '怎么办', '帮帮我',
+                '救命', '我不行', '放弃', '好难', '不会编',
+                '不知道怎么写', '没听懂', '不明白', '不会算'
+            ];
+            const cleaned = text.replace(/\s+/g, '').toLowerCase();
+            return keywords.some(function(kw) {
+                return cleaned.includes(kw);
+            });
+        }
+
+        // ========== 多等级点评库（修复版） ==========
+        function generateXiaohuiComment(commentText, problemText) {
+            const commentIsDifficulty = isExpressionOfDifficulty(commentText);
+            const problemIsDifficulty = isExpressionOfDifficulty(problemText);
+            
+            const hasComment = commentText.length > 0;
+            const hasProblem = problemText.length > 0;
+            const commentRich = commentText.length >= 15;
+            const problemRich = problemText.length >= 10;
+            
+            let level, levelClass, mainComment, suggestion;
+
+            // ===== 优先检测：学生明确表达了困难 =====
+            if ((hasComment && commentIsDifficulty) || (hasProblem && problemIsDifficulty)) {
+                level = '🤗 没关系，慢慢来';
+                levelClass = 'encourage';
+                
+                if (commentIsDifficulty && problemIsDifficulty) {
+                    mainComment = '我看到你写了"不会"，没关系，每个采购大师都是从零开始的！今天的内容确实有挑战，但你已经坐在课堂里认真听了，这就是最棒的开始。';
+                } else if (commentIsDifficulty) {
+                    mainComment = '评价豆包确实需要想一想。没关系，这说明你在认真思考，不是随便糊弄。';
+                } else {
+                    mainComment = '创编应用题确实有难度，需要把数学和情境结合起来。你能承认不会，比随便抄一个答案更诚实！';
+                }
+                
+                suggestion = '💡 小慧给你一个脚手架，试试看：<br>'
+                    + '① 豆包把18拆成了哪两个数？（答案就在上面的绿色对话框里）<br>'
+                    + '② 把这两个数分别乘3，再加起来，等于多少？<br>'
+                    + '把这两步写下来，你就已经迈出第一步了！';
+                
+                return { level, levelClass, mainComment, suggestion };
+            }
+
+            // ===== 正常评价逻辑 =====
+            if (hasComment && hasProblem && commentRich && problemRich) {
+                level = '🌟 优秀小讲师';
+                levelClass = 'excellent';
+                mainComment = '你的表现让我眼前一亮！评价写得很有见地，创编的应用题情境完整、算式正确，已经完全具备采购小助理的专业素养了！';
+                suggestion = '💡 挑战一下：你能不能把这道题编得更有趣一些？比如加上"沙滩音乐节需要采购物资"的故事背景，让题目更有生活味。';
+            } else if (hasComment && hasProblem) {
+                level = '👍 合格采购员';
+                levelClass = 'good';
+                mainComment = '两项任务都完成了，很好！你听懂了豆包的讲解，也能自己创编应用题，基本功过关。';
+                suggestion = '💡 小建议：下次可以写得更详细一些，比如评价豆包时说说它哪里讲得好、你还有没有不同的拆分方法。这样你的算理会更扎实哦！';
+            } else if (hasComment && !hasProblem) {
+                level = '📝 认真的倾听者';
+                levelClass = 'good';
+                if (commentRich) {
+                    mainComment = '你对豆包的评价很详细，能发现它用拆分法计算，说明你认真听了，算理理解到位！';
+                } else {
+                    mainComment = '你写下了对豆包的评价，迈出了表达的第一步，很棒！';
+                }
+                suggestion = '💡 还没创编题目？没关系！试试这个开头："一个游泳圈16元……"后面你想怎么写？';
+            } else if (!hasComment && hasProblem) {
+                level = '📐 创意出题人';
+                levelClass = 'good';
+                if (problemRich) {
+                    mainComment = '你创编的应用题很完整，能把数学知识用到实际采购中，这就是学数学的意义！';
+                } else {
+                    mainComment = '能自己创编题目，你已经从"解题人"升级为"出题人"了！';
+                }
+             suggestion = '💡 如果再加上对豆包的评价就更棒了！你觉得豆包拆分18的方法讲清楚了吗？你还有没有不同的拆分思路？';
+            } else {
+                level = '🌱 正在成长中';
+                levelClass = 'encourage';
+                mainComment = '没关系，每个采购大师都是从零开始的！也许你现在还没想好怎么写，但小慧相信你只是需要一点时间。';
+                suggestion = '💡 先试试回答这两个问题：①豆包把18拆成了哪两个数？②你能不能学豆包的方法，算一算16×3等于多少？把答案写在上面的框里就行！';
+            }
+
+            return { level, levelClass, mainComment, suggestion };
+        }
+
+        function switchDoubaoVersion(index) {
+            document.getElementById('doubaoExplanation').innerHTML = doubaoVersions[index];
+            const btns = document.querySelectorAll('#versionBtns .btn');
+            btns.forEach(function(btn, i) {
+                btn.classList.toggle('active', i === index);
+            });
+        }
+
+        document.getElementById('versionBtns').addEventListener('click', function(e) {
+            if (e.target && e.target.hasAttribute('data-version')) {
+                const versionIndex = parseInt(e.target.getAttribute('data-version'));
+                switchDoubaoVersion(versionIndex);
+            }
+        });
+
+        function showXiaohuiComment() {
+            const commentText = document.getElementById('studentComment').value.trim();
+            const problemText = document.getElementById('studentProblem').value.trim();
+            const box = document.getElementById('xiaohuiCommentBox');
+            const text = document.getElementById('xiaohuiCommentText');
+
+            box.classList.remove('hidden');
+
+            const result = generateXiaohuiComment(commentText, problemText);
+            
+            text.innerHTML = 
+                '<span class="comment-level ' + result.levelClass + '">' + result.level + '</span><br><br>' +
+                result.mainComment + '<br><br>' +
+                result.suggestion;
+        }
+
+        document.getElementById('commentBtn').addEventListener('click', showXiaohuiComment);
+
+        function rateStar(groupId, count) {
+            const stars = document.querySelectorAll('#' + groupId + ' .star');
+            stars.forEach(function(star, index) {
+                star.classList.toggle('lit', index < count);
+            });
+        }
+
+        function bindStarEvents(groupId) {
+            const container = document.getElementById(groupId);
+            container.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('star')) {
+                    const value = parseInt(e.target.getAttribute('data-value'));
+                    rateStar(groupId, value);
+                }
+            });
+        }
+
+        bindStarEvents('stars1');
+        bindStarEvents('stars2');
+        bindStarEvents('stars3');
+
+        function saveSelfEval() {
+            document.getElementById('saveConfirm').classList.remove('hidden');
+            const evalData = {
+                comment: document.getElementById('studentComment').value,
+                problem: document.getElementById('studentProblem').value,
+                gain: document.getElementById('studentGain').value,
+                time: new Date().toLocaleString()
+            };
+            localStorage.setItem('goldCoastSelfEval', JSON.stringify(evalData));
+        }
+
+        document.getElementById('saveBtn').addEventListener('click', saveSelfEval);
+    </script>
+</body>
+</html>
